@@ -31,7 +31,7 @@ flowchart TD
     D -->|Review Status matches CHECKS PASSED| F[Path B: Gmail pipeline report]
 ```
 
-![Zap workflow map — steps 2–8 with both path branches](../recruitment-pipeline-automation/screenshots/zap-workflow-map.png)
+![Zap workflow map — steps 2–8 with both path branches](screenshots/zap-workflow-map.png)
 
 The same flow, as captured in the Zap editor: steps 1–3 feed **4. Split into paths**, which routes to Path A (steps 5–6) and Path B (steps 7–8).
 
