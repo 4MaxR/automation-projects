@@ -31,7 +31,11 @@ flowchart TD
     D -->|Review Status matches CHECKS PASSED| F[Path B: Gmail pipeline report]
 ```
 
+<div align="center">
+
 ![Zap workflow map — steps 2–8 with both path branches](screenshots/zap-workflow-map.png)
+
+</div>
 
 The same flow, as captured in the Zap editor: steps 1–3 feed **4. Split into paths**, which routes to Path A (steps 5–6) and Path B (steps 7–8).
 
@@ -65,7 +69,11 @@ The source workbook, candidate names, client names, personal email address, and 
 4. Set the intended reporting day and time.
 5. Confirm the timezone before publishing.
 
+<div align="center">
+
 ![Zap step 1 — Every Week trigger](screenshots/zap-step-1-every-week-trigger.png)
+
+</div>
 
 _Zap editor, step 1: Monday and 7:00 AM selected; the optional timezone override was left empty in this capture._
 
@@ -85,7 +93,12 @@ Select **monday.com → API Request (Beta)** and use the connected monday.com ac
 | Query parameters | Empty                                             |
 | Authentication   | Supplied through the Zapier monday.com connection |
 
+<div align="center">
+
 ![Zap step 2 — monday.com API Request settings](screenshots/zap-step-2-monday-api-request.png)
+
+</div>
+
 
 _Zap editor, step 2: POST to `https://api.monday.com/v2` with the API version header and the GraphQL body (board ID redacted)._
 
@@ -93,7 +106,11 @@ The GraphQL operation reads data. Although the HTTP method is POST, the operatio
 
 Use the body in [monday-request.json](monday-request.json), replacing `YOUR_BOARD_ID` with the board's numeric ID. The board name is not an API board ID.
 
+<div align="center">
+
 ![Where the board ID appears in the URL](screenshots/monday-board-id-location.png)
+
+</div>
 
 _The numeric board ID appears at the end of the board's URL (workspace name and ID redacted)._
 
@@ -152,7 +169,11 @@ The complete response preserves the relationship between each record and its col
 
 Paste [src/pipeline_report.js](src/pipeline_report.js) into the code editor.
 
+<div align="center">
+
 ![Zap step 3 — code step with mapped input](screenshots/zap-step-3-javascript-report-code.png)
+
+</div>
 
 _Zap editor, step 3: `pipeline_response` mapped to step 2's Response Body, with the validation code in the editor._
 
@@ -224,7 +245,11 @@ Under Path A, add **Gmail → Send Email** and connect Gmail.
 
 Mapping **Issue Count** alone produces a number such as `5`. Mapping **Issues** supplies the actual record-level details.
 
+<div align="center">
+
 ![Zap step 6 — data review alert email](screenshots/zap-step-6-review-alert-email.png)
+
+</div>
 
 _Zap editor, step 6 (Path A): the review alert with Review Status, Issue Count, and the full issue list mapped from step 3 (email address redacted)._
 
@@ -261,7 +286,11 @@ The final intended design prepares the report in step 3 and uses **Gmail → Sen
 
 A separate calculation step was initially added under Path B. The design was simplified to put the calculation in step 3. This documentation and the included code represent that consolidated design; the final UI changes and report email delivery were not verified after simplification.
 
+<div align="center">
+
 ![Zap step 8 — report email](screenshots/zap-step-8-report-email.png)
+
+</div>
 
 _Zap editor, step 8 (Path B): the report email as captured during testing; the final mapping and delivery were not verified (email address redacted)._
 
