@@ -31,7 +31,7 @@ flowchart TD
     D -->|Review Status matches CHECKS PASSED| F[Path B: Gmail pipeline report]
 ```
 
-![Zap workflow map — steps 2–8 with both path branches](screenshots/zap-workflow-map.png)
+![Zap workflow map — steps 2–8 with both path branches](../recruitment-pipeline-automation/screenshots/zap-workflow-map.png)
 
 The same flow, as captured in the Zap editor: steps 1–3 feed **4. Split into paths**, which routes to Path A (steps 5–6) and Path B (steps 7–8).
 
@@ -41,17 +41,17 @@ An API failure, missing response structure, missing required column, or incomple
 
 The practice board contained **42 records** and these fields:
 
-| Field | Purpose |
-|---|---|
-| Record ID | Imported as the monday.com item name; identifies a source row |
-| Candidate Name | Candidate label; used to flag possible duplicates |
-| Source | Recruitment channel |
-| Practice Area | Legal specialism |
-| Recruiter | Assigned recruiter |
-| Stage | Current pipeline stage |
+| Field          | Purpose                                                       |
+| -------------- | ------------------------------------------------------------- |
+| Record ID      | Imported as the monday.com item name; identifies a source row |
+| Candidate Name | Candidate label; used to flag possible duplicates             |
+| Source         | Recruitment channel                                           |
+| Practice Area  | Legal specialism                                              |
+| Recruiter      | Assigned recruiter                                            |
+| Stage          | Current pipeline stage                                        |
 | Submitted Date | Source date field; its business meaning requires confirmation |
-| Last Updated | Source update date |
-| Client | Associated client, where available |
+| Last Updated   | Source update date                                            |
+| Client         | Associated client, where available                            |
 
 The report is a **weekly snapshot of all current board records**. It does not calculate new hires or stage changes occurring within the previous week. That would require confirmed date definitions and historical stage events or saved snapshots.
 
@@ -67,7 +67,7 @@ The source workbook, candidate names, client names, personal email address, and 
 
 ![Zap step 1 — Every Week trigger](screenshots/zap-step-1-every-week-trigger.png)
 
-*Zap editor, step 1: Monday and 7:00 AM selected; the optional timezone override was left empty in this capture.*
+_Zap editor, step 1: Monday and 7:00 AM selected; the optional timezone override was left empty in this capture._
 
 The trigger test returned a next occurrence of **October 5, 2026, 07:00 UTC**. Monday at 7:00 AM in `Africa/Cairo` was subsequently recommended, but the final timezone setting was not verified. The test result should not be described as proof of a Cairo-time schedule.
 
@@ -75,19 +75,19 @@ The trigger test returned a next occurrence of **October 5, 2026, 07:00 UTC**. M
 
 Select **monday.com → API Request (Beta)** and use the connected monday.com account.
 
-| Setting | Configuration used |
-|---|---|
-| Stop on error | Yes |
-| HTTP method | POST |
-| URL | `https://api.monday.com/v2` |
-| Content-Type | `application/json` |
-| API-Version | `2026-07` |
-| Query parameters | Empty |
-| Authentication | Supplied through the Zapier monday.com connection |
+| Setting          | Configuration used                                |
+| ---------------- | ------------------------------------------------- |
+| Stop on error    | Yes                                               |
+| HTTP method      | POST                                              |
+| URL              | `https://api.monday.com/v2`                       |
+| Content-Type     | `application/json`                                |
+| API-Version      | `2026-07`                                         |
+| Query parameters | Empty                                             |
+| Authentication   | Supplied through the Zapier monday.com connection |
 
 ![Zap step 2 — monday.com API Request settings](screenshots/zap-step-2-monday-api-request.png)
 
-*Zap editor, step 2: POST to `https://api.monday.com/v2` with the API version header and the GraphQL body (board ID redacted).*
+_Zap editor, step 2: POST to `https://api.monday.com/v2` with the API version header and the GraphQL body (board ID redacted)._
 
 The GraphQL operation reads data. Although the HTTP method is POST, the operation is a query that does not update the board.
 
@@ -95,7 +95,7 @@ Use the body in [monday-request.json](monday-request.json), replacing `YOUR_BOAR
 
 ![Where the board ID appears in the URL](screenshots/monday-board-id-location.png)
 
-*The numeric board ID appears at the end of the board's URL (workspace name and ID redacted).*
+_The numeric board ID appears at the end of the board's URL (workspace name and ID redacted)._
 
 ```graphql
 query ($boardId: ID!) {
@@ -103,13 +103,21 @@ query ($boardId: ID!) {
     id
     name
     items_count
-    columns { id title type }
+    columns {
+      id
+      title
+      type
+    }
     items_page(limit: 100) {
       cursor
       items {
         id
         name
-        column_values { id text value }
+        column_values {
+          id
+          text
+          value
+        }
       }
     }
   }
@@ -122,11 +130,11 @@ The request asks for up to 100 records. It also requests a cursor so an incomple
 
 An initial diagnostic JavaScript step returned:
 
-| Output | Observed result |
-|---|---|
-| Reported Count | 42 |
-| Fetched Count | 42 |
-| More Pages | false |
+| Output         | Observed result |
+| -------------- | --------------- |
+| Reported Count | 42              |
+| Fetched Count  | 42              |
+| More Pages     | false           |
 
 This confirmed that the test retrieved all 42 records in the board at that time.
 
@@ -136,8 +144,8 @@ Select **Code by Zapier → Run Javascript**. Suggested step name: **Check Data 
 
 ### Input mapping
 
-| Input key: left box | Mapped value: right box |
-|---|---|
+| Input key: left box | Mapped value: right box    |
+| ------------------- | -------------------------- |
 | `pipeline_response` | Step 2 → **Response Body** |
 
 The complete response preserves the relationship between each record and its columns. A record count or an individual flattened field is not a substitute for the full JSON response.
@@ -146,7 +154,7 @@ Paste [src/pipeline_report.js](src/pipeline_report.js) into the code editor.
 
 ![Zap step 3 — code step with mapped input](screenshots/zap-step-3-javascript-report-code.png)
 
-*Zap editor, step 3: `pipeline_response` mapped to step 2's Response Body, with the validation code in the editor.*
+_Zap editor, step 3: `pipeline_response` mapped to step 2's Response Body, with the validation code in the editor._
 
 ### Checks and transformations
 
@@ -163,11 +171,11 @@ Paste [src/pipeline_report.js](src/pipeline_report.js) into the code editor.
 
 The stage mappings used were:
 
-| Source label | Standardized label |
-|---|---|
-| Submitted | Submitted to Client |
-| Interview | Client Interview |
-| Offer | Offer Extended |
+| Source label | Standardized label  |
+| ------------ | ------------------- |
+| Submitted    | Submitted to Client |
+| Interview    | Client Interview    |
+| Offer        | Offer Extended      |
 
 These are explicit assumptions for the assessment dataset. A different organization should confirm its own stage meanings before reusing them. Normalization changes the script output; it does not write changes back to monday.com.
 
@@ -175,16 +183,16 @@ Repeated names are **possible duplicates**, not automatic proof that two rows re
 
 ### Output fields
 
-| Output | Use |
-|---|---|
-| `review_status` | `NEEDS REVIEW` or `CHECKS PASSED` |
-| `record_count` | Number of fetched records |
-| `standardized_stages` | Number of stage labels changed in the output |
-| `issue_count` | Number of review flags |
-| `issues` | Human-readable issue details |
-| `records_json` | Normalized records serialized as one JSON value |
-| `report_subject` | Subject for the report email |
-| `report_body` | Report text, or a withholding message when issues remain |
+| Output                | Use                                                      |
+| --------------------- | -------------------------------------------------------- |
+| `review_status`       | `NEEDS REVIEW` or `CHECKS PASSED`                        |
+| `record_count`        | Number of fetched records                                |
+| `standardized_stages` | Number of stage labels changed in the output             |
+| `issue_count`         | Number of review flags                                   |
+| `issues`              | Human-readable issue details                             |
+| `records_json`        | Normalized records serialized as one JSON value          |
+| `report_subject`      | Subject for the report email                             |
+| `report_body`         | Report text, or a withholding message when issues remain |
 
 The consolidated script's syntax was checked locally. Its final report outputs were not demonstrated in a successful Zapier clean-data run. The earlier validation step was tested in Zapier and produced the results below.
 
@@ -192,52 +200,52 @@ The consolidated script's syntax was checked locally. Its final report outputs w
 
 Add **Paths by Zapier** after step 3. Use **Custom rules**.
 
-| Branch | Field | Condition | Comparison value |
-|---|---|---|---|
-| Path A: Data Issues — Send Alert | Step 3 → Issue Count | `(Number) Greater than` | `0` |
-| Path B: Checks Passed — Send Report | Step 3 → Review Status | `(Text) Contains` | `CHECKS PASSED` |
+| Branch                              | Field                  | Condition               | Comparison value |
+| ----------------------------------- | ---------------------- | ----------------------- | ---------------- |
+| Path A: Data Issues — Send Alert    | Step 3 → Issue Count   | `(Number) Greater than` | `0`              |
+| Path B: Checks Passed — Send Report | Step 3 → Review Status | `(Text) Contains`       | `CHECKS PASSED`  |
 
 The Path B test showed **“Your path would not have continued”** with a `NEEDS REVIEW` sample. That was the expected result: the report route was blocked by the data checks.
 
-| Path A rule (step 5) | Path B rule (step 7) |
-|---|---|
-| ![Path A rule and test](screenshots/zap-step-5-path-a-rule.png) | ![Path B rule and test](screenshots/zap-step-7-path-b-rule.png) |
-| *Issue count greater than 0 — the test path continued (issue count: 5).* | *Review status contains `CHECKS PASSED` — the test path was blocked (`NEEDS REVIEW`).* |
+| Path A rule (step 5)                                                     | Path B rule (step 7)                                                                   |
+| ------------------------------------------------------------------------ | -------------------------------------------------------------------------------------- |
+| ![Path A rule and test](screenshots/zap-step-5-path-a-rule.png)          | ![Path B rule and test](screenshots/zap-step-7-path-b-rule.png)                        |
+| _Issue count greater than 0 — the test path continued (issue count: 5)._ | _Review status contains `CHECKS PASSED` — the test path was blocked (`NEEDS REVIEW`)._ |
 
 ## Step 5 — Deliver the data review alert
 
 Under Path A, add **Gmail → Send Email** and connect Gmail.
 
-| Email field | Configuration |
-|---|---|
-| To | The project's own test recipient address |
-| Subject | `Pipeline report — data needs review` |
-| Body | Introductory text plus Step 3 → **Issues**; Review Status and Issue Count can also be included |
+| Email field | Configuration                                                                                  |
+| ----------- | ---------------------------------------------------------------------------------------------- |
+| To          | The project's own test recipient address                                                       |
+| Subject     | `Pipeline report — data needs review`                                                          |
+| Body        | Introductory text plus Step 3 → **Issues**; Review Status and Issue Count can also be included |
 
 Mapping **Issue Count** alone produces a number such as `5`. Mapping **Issues** supplies the actual record-level details.
 
 ![Zap step 6 — data review alert email](screenshots/zap-step-6-review-alert-email.png)
 
-*Zap editor, step 6 (Path A): the review alert with Review Status, Issue Count, and the full issue list mapped from step 3 (email address redacted).*
+_Zap editor, step 6 (Path A): the review alert with Review Status, Issue Count, and the full issue list mapped from step 3 (email address redacted)._
 
 ### Verified issues
 
-| Review flag | Records affected |
-|---|---|
-| Missing Submitted Date | R004 |
-| Missing Submitted Date | R019 |
-| Missing stage | R027 |
-| First possible duplicate pair | R014, R015 |
-| Second possible duplicate pair | R035, R042 |
+| Review flag                    | Records affected |
+| ------------------------------ | ---------------- |
+| Missing Submitted Date         | R004             |
+| Missing Submitted Date         | R019             |
+| Missing stage                  | R027             |
+| First possible duplicate pair  | R014, R015       |
+| Second possible duplicate pair | R035, R042       |
 
 ### Observed validation results
 
-| Output | Result |
-|---|---|
-| Review Status | NEEDS REVIEW |
-| Record Count | 42 |
-| Standardized Stages | 3 |
-| Issue Count | 5 |
+| Output              | Result       |
+| ------------------- | ------------ |
+| Review Status       | NEEDS REVIEW |
+| Record Count        | 42           |
+| Standardized Stages | 3            |
+| Issue Count         | 5            |
 
 The Gmail test delivered an email containing all five issue details. This verifies the validation-alert route and email delivery for the tested sample. It does not establish that the weekly scheduled job has run in production.
 
@@ -245,17 +253,17 @@ The Gmail test delivered an email containing all five issue details. This verifi
 
 The final intended design prepares the report in step 3 and uses **Gmail → Send Email** directly under Path B.
 
-| Email field | Mapping |
-|---|---|
-| To | The project's own test recipient address |
-| Subject | Step 3 → **Report Subject** |
-| Body | Step 3 → **Report Body** |
+| Email field | Mapping                                  |
+| ----------- | ---------------------------------------- |
+| To          | The project's own test recipient address |
+| Subject     | Step 3 → **Report Subject**              |
+| Body        | Step 3 → **Report Body**                 |
 
 A separate calculation step was initially added under Path B. The design was simplified to put the calculation in step 3. This documentation and the included code represent that consolidated design; the final UI changes and report email delivery were not verified after simplification.
 
 ![Zap step 8 — report email](screenshots/zap-step-8-report-email.png)
 
-*Zap editor, step 8 (Path B): the report email as captured during testing; the final mapping and delivery were not verified (email address redacted).*
+_Zap editor, step 8 (Path B): the report email as captured during testing; the final mapping and delivery were not verified (email address redacted)._
 
 ### Metric definitions
 
@@ -269,16 +277,16 @@ Path B's successful report test was left pending at the author's request. No cle
 
 ## Troubleshooting lessons
 
-| Problem encountered | Resolution or lesson |
-|---|---|
-| Board name entered where the API expected an ID | Use the numeric board ID |
-| Input key placed in the value box | Put the key on the left and the mapped response on the right |
-| Trigger output copied instead of code output | Inspect the correct step's Data out |
-| Issue Count compared with the text CHECKS PASSED | Compare Review Status using `(Text) Exactly matches` |
-| Record Count mapped as Records Json | Map the serialized records field, not the number of records |
-| Report code blocked a sample with five issues | Blocking dirty data was expected; the source checks still required review |
-| Report calculation pasted multiple times | Keep one declaration of each variable; replace the existing final block rather than appending copies |
-| Alert email contained only the issue count | Map Issues so the recipient receives actionable details |
+| Problem encountered                              | Resolution or lesson                                                                                 |
+| ------------------------------------------------ | ---------------------------------------------------------------------------------------------------- |
+| Board name entered where the API expected an ID  | Use the numeric board ID                                                                             |
+| Input key placed in the value box                | Put the key on the left and the mapped response on the right                                         |
+| Trigger output copied instead of code output     | Inspect the correct step's Data out                                                                  |
+| Issue Count compared with the text CHECKS PASSED | Compare Review Status using `(Text) Exactly matches`                                                 |
+| Record Count mapped as Records Json              | Map the serialized records field, not the number of records                                          |
+| Report code blocked a sample with five issues    | Blocking dirty data was expected; the source checks still required review                            |
+| Report calculation pasted multiple times         | Keep one declaration of each variable; replace the existing final block rather than appending copies |
+| Alert email contained only the issue count       | Map Issues so the recipient receives actionable details                                              |
 
 ## Operating and recovery procedure
 
@@ -302,20 +310,20 @@ Zapier's immediate error notifications were recommended as the next failure-moni
 
 ## Verification status and next improvements
 
-| Component | Status |
-|---|---|
-| Real monday.com and Zapier configuration | Demonstrated |
-| API retrieval of all 42 records | Verified in a test |
-| Validation and three stage mappings | Verified in a test |
-| Five review flags | Verified in a test |
-| Path B blocking the dirty-data sample | Verified in a test |
-| Detailed Gmail review alert | Delivery verified |
-| Consolidated script | Syntax checked locally |
-| Clean-data report branch | Not verified |
-| Final consolidated UI configuration | Not verified |
-| Cairo timezone configuration | Not verified |
-| Failure notification setup | Not verified; plan limitation reported during final setup |
-| Published, unattended weekly operation | Not verified |
+| Component                                | Status                                                    |
+| ---------------------------------------- | --------------------------------------------------------- |
+| Real monday.com and Zapier configuration | Demonstrated                                              |
+| API retrieval of all 42 records          | Verified in a test                                        |
+| Validation and three stage mappings      | Verified in a test                                        |
+| Five review flags                        | Verified in a test                                        |
+| Path B blocking the dirty-data sample    | Verified in a test                                        |
+| Detailed Gmail review alert              | Delivery verified                                         |
+| Consolidated script                      | Syntax checked locally                                    |
+| Clean-data report branch                 | Not verified                                              |
+| Final consolidated UI configuration      | Not verified                                              |
+| Cairo timezone configuration             | Not verified                                              |
+| Failure notification setup               | Not verified; plan limitation reported during final setup |
+| Published, unattended weekly operation   | Not verified                                              |
 
 Further work would include a clean-data report test, confirmed source corrections, automatic pagination beyond 100 rows, validated date formats and business definitions, duplicate-review decisions stored against stable application IDs, record-ID uniqueness checks, an approved empty-board policy, and a saved run log. These are future improvements, not features already demonstrated.
 
