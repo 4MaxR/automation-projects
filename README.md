@@ -9,7 +9,7 @@ Each project lives in its own folder with its own README, screenshots, and code.
 | Project | What it does | Tools | Status |
 | --- | --- | --- | --- |
 | **[Weekly Recruitment Pipeline Report](weekly-recruitment-pipeline-report/)** | A scheduled weekly report on a recruitment pipeline with data-quality checks built in. Reads the monday.com board through GraphQL, normalizes stage labels, flags issues, then routes to either a data review alert or the weekly report email. | monday.com, Zapier, JavaScript, GraphQL, Gmail | Core build completed and tested (42 records retrieved, 5 issues flagged, alert delivered); clean-data report branch not yet verified |
-| **[Logistics CRM & Lead Confirmation](logistics-crm-automation/)** | Lead intake for a logistics business. A monday.com WorkForm captures each inquiry on a Leads board, and a Zap sends the prospect a personalized acknowledgment email. Qualified-lead-to-deal handoff is the planned next step. | monday.com WorkForm, Zapier, Gmail | Boards, form, and Zap configured; Gmail action test passed; publication and live delivery not yet verified |
+| **[Logistics CRM & Lead Confirmation](logistics-crm-automation/)** | Lead intake for a logistics business. A monday.com WorkForm captures each inquiry on a Leads board; a Zap waits for the record to finish populating, retrieves it by Item ID, then either emails the prospect an acknowledgment or creates an internal work-assignment item. Qualified-lead-to-deal handoff is planned next. | monday.com, WorkForm, Zapier, Gmail | Boards, form, and Zap with delay + Item ID lookup and Gmail/Create Item paths configured; step tests passing; publication and live delivery not yet verified |
 
 ## Repository structure
 
