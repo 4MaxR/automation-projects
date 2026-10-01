@@ -1,6 +1,6 @@
 # Automation Projects
 
-A collection of end-to-end automation projects I have built, configured, and documented — mainly **Zapier** workflows connecting **monday.com**, **Gmail**, and **JavaScript**.
+A collection of end-to-end automation projects I have built, configured, and documented — mainly **Zapier** workflows connecting **monday.com**, **Google Workspace** (Forms, Sheets, Gmail), and **JavaScript**.
 
 Each project lives in its own folder with its own README, screenshots, and code. Pick one below to see how it works.
 
@@ -10,6 +10,7 @@ Each project lives in its own folder with its own README, screenshots, and code.
 | --- | --- | --- | --- |
 | **[Weekly Recruitment Pipeline Report](weekly-recruitment-pipeline-report/)** | A scheduled weekly report on a recruitment pipeline with data-quality checks built in. Reads the monday.com board through GraphQL, normalizes stage labels, flags issues, then routes to either a data review alert or the weekly report email. | monday.com, Zapier, JavaScript, GraphQL, Gmail | Core build completed and tested (42 records retrieved, 5 issues flagged, alert delivered); clean-data report branch not yet verified |
 | **[Logistics CRM & Lead Confirmation](logistics-crm-automation/)** | Lead intake for a logistics business. A monday.com WorkForm captures each inquiry on a Leads board; a Zap waits for the record to finish populating, retrieves it by Item ID, then either emails the prospect an acknowledgment or creates an internal work-assignment item. Qualified-lead-to-deal handoff is planned next. | monday.com, WorkForm, Zapier, Gmail | Boards, form, and Zap with delay + Item ID lookup and Gmail/Create Item paths configured; step tests passing; publication and live delivery not yet verified |
+| **[TuckerTech Intake & Technician Routing](tuckertech-intake-routing/)** | Repair-shop customer intake. A Google Form feeds Zapier; requests are date-formatted, split by device type, and recorded in a Google Sheets tracker. After a 30-minute review window, PC requests are assigned to Sarah and Mac requests to Joey; other devices are recorded as Declined and receive a reply email. | Google Forms, Zapier, Google Sheets, Gmail | Core workflow configured and partially tested (trigger, formatter, path rules, row creation); technician-assignment updates and declined-email delivery not yet verified |
 
 ## Repository structure
 
@@ -17,6 +18,7 @@ Each project lives in its own folder with its own README, screenshots, and code.
 .
 ├── weekly-recruitment-pipeline-report/   # scheduled pipeline report with data-quality checks
 ├── logistics-crm-automation/             # lead intake form + confirmation email
+├── tuckertech-intake-routing/            # repair-shop intake: form → tracker → technician routing
 └── _template/                            # skeleton used for each new project README
 ```
 
